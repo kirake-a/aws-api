@@ -1,0 +1,60 @@
+from fastapi import Request, status
+from fastapi.responses import JSONResponse
+
+from dtos.response_wrapper import ResponseWrapper
+from exceptions.cannot_delete_resource_exception import CannotDeleteResourceException
+from exceptions.cannot_update_resource_exception import CannotUpdateResourceException
+from exceptions.conflict_with_existing_resources_exception import ConflictWithExistingResourcesException
+from exceptions.resource_not_found_exception import ResourceNotFoundException
+from utils.constants import UNEXPECTED_ERROR
+
+
+def resource_not_found_exception_handler(_request: Request, exc: ResourceNotFoundException):
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content=ResponseWrapper(
+            success=False,
+            message=str(exc),
+            data=None
+        ).model_dump()
+    )
+
+def conflict_exception_handler(_request: Request, exc: ConflictWithExistingResourcesException):
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content=ResponseWrapper(
+            success=False,
+            message=str(exc),
+            data=None
+        ).model_dump()
+    )
+
+def cannot_update_exception_handler(_request: Request, exc: CannotUpdateResourceException):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content=ResponseWrapper(
+            success=False,
+            message=str(exc),
+            data=None
+        ).model_dump()
+    )
+
+def cannot_delete_exception_handler(_request: Request, exc: CannotDeleteResourceException):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content=ResponseWrapper(
+            success=False,
+            message=str(exc),
+            data=None
+        ).model_dump()
+    )
+
+def generic_exception_handler(_request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=ResponseWrapper(
+            success=False,
+            message=UNEXPECTED_ERROR + str(exc),
+            data=None
+        ).model_dump()
+    )
