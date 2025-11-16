@@ -22,7 +22,7 @@ class StudentService(ServiceInterface):
         self.logger.info("Fetching all students from the repository")
         return self.repository.get_all_students()
 
-    def get_by_id(self, student_id: str) -> Student:
+    def get_by_id(self, student_id: int) -> Student:
         self.logger.info(f"Fetching student with ID: {student_id}")
         student = self.repository.get_student_by_id(student_id)
 
@@ -34,22 +34,20 @@ class StudentService(ServiceInterface):
         raise ResourceNotFoundException(STUDENT_NOT_FOUND)
 
     def create(self, student_data: StudentCreateDTO) -> Student:
-
-        if email_exists(student_data.email, self.repository.get_all_students()):
-            self.logger.error(f"Email already exists: {student_data.email}")
-            raise ConflictWithExistingResourcesException("Email already exists")
-
-        student_id = generate_id()
-        student_registration = generate_registration()
         student_dict = student_data.model_dump()
 
-        new_student = Student(id=student_id, registration=student_registration, **student_dict)
+        if student_data.promedio < 0.0 or student_data.promedio > 10.0:
+            self.logger.error("Invalid average score provided")
+            raise ConflictWithExistingResourcesException("Average score must be between 0.0 and 10.0")
+
+        new_student = Student(**student_dict)
         student = self.repository.create_student(new_student)
 
-        self.logger.info(f"Student created with ID: {student_id}")
+        self.logger.info(f"Student created with ID: {student.id}")
         return student
 
-    def update(self, student_id: str, student_data: StudentUpdateDTO) -> Student:
+    def update(self, student_id: int, student_data: StudentUpdateDTO) -> Student:
+        self.logger.info("Starting update process")
         existing_student = self.repository.get_student_by_id(student_id)
 
         if not existing_student:

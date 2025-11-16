@@ -10,7 +10,7 @@ router = APIRouter(prefix="/alumnos", tags=["Alumnos"])
 service = StudentService()
 
 @router.get(
-    "/",
+    "",
     status_code=status.HTTP_200_OK,
     response_model=ResponseWrapper[List[StudentResponseDTO]],
     summary="Get all students",
@@ -28,21 +28,17 @@ async def get_all_students() -> ResponseWrapper[List[StudentResponseDTO]]:
 @router.get(
     "/{id}",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseWrapper[StudentResponseDTO],
+    response_model=StudentResponseDTO,
     summary="Get student by ID",
     description="Retrieve a student by their unique ID. Validates that the ID exists."
 )
-async def get_student_by_id(id: str) -> ResponseWrapper[StudentResponseDTO]:
+async def get_student_by_id(id: int) -> ResponseWrapper[StudentResponseDTO]:
     student = service.get_by_id(id)
 
-    return ResponseWrapper(
-        success=True,
-        message="Student retrieved successfully.",
-        data=StudentResponseDTO.model_validate(student)
-    )
+    return StudentResponseDTO.model_validate(student)
 
 @router.post(
-    "/",
+    "",
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseWrapper[StudentResponseDTO],
     summary="Create a new student",
@@ -54,7 +50,8 @@ async def create_student(student: StudentCreateDTO) -> ResponseWrapper[StudentRe
     return ResponseWrapper(
         success=True,
         message="Student created successfully.",
-        data=StudentResponseDTO.model_validate(create_student)
+        data=StudentResponseDTO.model_validate(create_student),
+        status_code=status.HTTP_201_CREATED
     )
 
 @router.put(
@@ -64,7 +61,7 @@ async def create_student(student: StudentCreateDTO) -> ResponseWrapper[StudentRe
     summary="Update an existing student",
     description="Update an existing student in the system."
 )
-async def update_student(id: str, student: StudentUpdateDTO) -> ResponseWrapper[StudentResponseDTO]:
+async def update_student(id: int, student: StudentUpdateDTO) -> ResponseWrapper[StudentResponseDTO]:
     updated_student = service.update(id, student)
 
     return ResponseWrapper(
@@ -75,9 +72,9 @@ async def update_student(id: str, student: StudentUpdateDTO) -> ResponseWrapper[
 
 @router.delete(
     "/{id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_200_OK,
     summary="Delete a student",
     description="Delete an existing student from the system."
 )
-async def delete_student(id: str):
+async def delete_student(id: int):
     service.delete(id)

@@ -3,30 +3,25 @@ from pydantic import BaseModel, EmailStr
 
 
 class StudentBaseDTO(BaseModel):
-    name: str
-    last_name: str
-    email: EmailStr
-    semester: int
-    average_grade: float
+    nombres: str
+    apellidos: str
+    matricula: str
+    promedio: float
 
 class StudentCreateDTO(StudentBaseDTO):
+    id: int
     class Config:
         from_attributes = True
 
 class StudentUpdateDTO(BaseModel):
-    registration: Optional[str] = None
-    name: Optional[str] = None
-    last_name: Optional[str] = None
-    email: Optional[EmailStr] = None
-    semester: Optional[int] = None
-    average_grade: Optional[float] = None
+    matricula: Optional[str] = None
+    nombres: Optional[str] = None
+    apellidos: Optional[str] = None
 
     class Config:
         from_attributes = True
 
 class StudentResponseDTO(StudentBaseDTO):
-    id: str
-    registration: str
-
+    id: int
     class Config:
         from_attributes = True

@@ -9,7 +9,7 @@ class StudentRepository:
     def get_all_students(self) -> List[Student]:
         return self.student_data
 
-    def get_student_by_id(self, student_id: str) -> Student | None:
+    def get_student_by_id(self, student_id: int) -> Student | None:
         for student in self.student_data:
             if student.id == student_id:
                 return student
@@ -21,7 +21,7 @@ class StudentRepository:
 
         return student
 
-    def update_student(self, student_id: str, updated_student: Student) -> Student | None:
+    def update_student(self, student_id: int, updated_student: Student) -> Student | None:
         for index, student in enumerate(self.student_data):
             if student.id == student_id:
                 self.student_data[index] = updated_student

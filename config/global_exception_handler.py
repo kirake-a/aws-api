@@ -1,4 +1,5 @@
 from fastapi import Request, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from dtos.response_wrapper import ResponseWrapper
@@ -22,6 +23,16 @@ def resource_not_found_exception_handler(_request: Request, exc: ResourceNotFoun
 def conflict_exception_handler(_request: Request, exc: ConflictWithExistingResourcesException):
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
+        content=ResponseWrapper(
+            success=False,
+            message=str(exc),
+            data=None
+        ).model_dump()
+    )
+
+def validation_exception_handler(_request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
         content=ResponseWrapper(
             success=False,
             message=str(exc),
