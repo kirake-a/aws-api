@@ -22,7 +22,7 @@ class ProfessorService(ServiceInterface):
         self.logger.info("Fetching all professors from the repository")
         return self.repository.get_all_professors()
 
-    def get_by_id(self, professor_id: str) -> Professor:
+    def get_by_id(self, professor_id: int) -> Professor:
         self.logger.info(f"Fetching professor with ID: {professor_id}")
         professor = self.repository.get_professor_by_id(professor_id)
 
@@ -33,31 +33,29 @@ class ProfessorService(ServiceInterface):
         raise ResourceNotFoundException(PROFESSOR_NOT_FOUND)
 
     def create(self, professor_data: ProfessorCreateDTO) -> Professor:
-        self.logger.info(f"Creating new professor with email: {professor_data.email}")
+        self.logger.info("Creating a new professor")
 
-        if email_exists(professor_data.email, self.repository.get_all_professors()):
-            self.logger.error(f"Email already exists: {professor_data.email}")
-            raise ConflictWithExistingResourcesException("Email already exists")
-        
-        professor_id = generate_id()
-        professor_employee_number = generate_employee_number()
-        professor_dict = professor_data.model_dump()
-
-        new_professor = Professor(id=professor_id, employee_number=professor_employee_number, **professor_dict)
+        new_professor = Professor(
+            id=professor_data.id,
+            nombres=professor_data.nombres,
+            apellidos=professor_data.apellidos,
+            horas_clase=professor_data.horasClase,
+            numero_empleado=professor_data.numeroEmpleado
+        )
 
         professor = self.repository.create_professor(new_professor)
 
-        self.logger.info(f"Professor created with ID: {professor_id}")
+        self.logger.info(f"Professor created with ID: {professor.id}")
         return professor
 
-    def update(self, professor_id: str, professor_data: ProfessorUpdateDTO) -> Professor:
+    def update(self, professor_id: int, professor_data: ProfessorUpdateDTO) -> Professor:
         existing_professor = self.repository.get_professor_by_id(professor_id)
 
         if not existing_professor:
             self.logger.error(f"Professor with ID: {professor_id} not found")
             raise ResourceNotFoundException(PROFESSOR_NOT_FOUND)
         
-        updated_data = professor_data.model_dump(exclude_unset=True)
+        updated_data = professor_data.model_dump(exclude_unset=True, by_alias=True)
 
         for key, value in updated_data.items():
             setattr(existing_professor, key, value)
@@ -71,7 +69,7 @@ class ProfessorService(ServiceInterface):
         self.logger.error(f"Could not update professor with ID: {professor_id}")
         raise CannotUpdateResourceException("Could not update professor")
 
-    def delete(self, professor_id: str) -> None:
+    def delete(self, professor_id: int) -> None:
         if not self.repository.is_professor_exist(professor_id):
             self.logger.error(f"Professor with ID: {professor_id} not found")
             raise ResourceNotFoundException(PROFESSOR_NOT_FOUND)

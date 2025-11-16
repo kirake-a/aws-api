@@ -1,30 +1,30 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field
 
 
 class ProfessorBaseDTO(BaseModel):
-    name: str
-    last_name: str
-    email: EmailStr
-    class_hours: int
+    nombres: str
+    apellidos: str
+    numeroEmpleado: int
+    horasClase: int
 
 class ProfessorCreateDTO(ProfessorBaseDTO):
+    id: int
     class Config:
         from_attributes = True
 
 class ProfessorUpdateDTO(BaseModel):
-    employee_number: Optional[str] = None
-    name: Optional[str] = None
-    last_name: Optional[str] = None
-    email: Optional[EmailStr] = None
-    class_hours: Optional[int] = None
+    numeroEmpleado: Optional[int] = Field(None, alias='numero_empleado')
+    nombres: Optional[str] = None
+    apellidos: Optional[str] = None
+    horasClase: Optional[int] = Field(None, alias='horas_clase')
 
     class Config:
         from_attributes = True
+        populate_by_name = True
 
 class ProfessorResponseDTO(ProfessorBaseDTO):
-    id: str
-    employee_number: str
+    id: int
 
     class Config:
         from_attributes = True

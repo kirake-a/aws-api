@@ -8,7 +8,7 @@ class ProfessorRepository:
     def get_all_professors(self) -> List[Professor]:
         return self.professor_data
 
-    def get_professor_by_id(self, professor_id: str) -> Professor | None:
+    def get_professor_by_id(self, professor_id: int) -> Professor | None:
         for professor in self.professor_data:
             if professor.id == professor_id:
                 return professor
@@ -20,7 +20,7 @@ class ProfessorRepository:
 
         return professor
 
-    def update_professor(self, professor_id: str, updated_professor: Professor) -> Professor | None:
+    def update_professor(self, professor_id: int, updated_professor: Professor) -> Professor | None:
         for index, professor in enumerate(self.professor_data):
             if professor.id == professor_id:
                 self.professor_data[index] = updated_professor
@@ -28,7 +28,7 @@ class ProfessorRepository:
 
         return None
 
-    def delete_professor(self, professor_id: str) -> Professor | None:
+    def delete_professor(self, professor_id: int) -> Professor | None:
         for index, professor in enumerate(self.professor_data):
             if professor.id == professor_id:
                 del self.professor_data[index]
@@ -36,7 +36,7 @@ class ProfessorRepository:
 
         return None
 
-    def is_professor_exist(self, professor_id: str) -> bool:
+    def is_professor_exist(self, professor_id: int) -> bool:
         for professor in self.professor_data:
             if professor.id == professor_id:
                 return True

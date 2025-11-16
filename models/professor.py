@@ -2,9 +2,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Professor:
-    id: str
-    employee_number: str
-    name: str
-    last_name: str
-    email: str
-    class_hours: int
+    id: int
+    numero_empleado: int
+    nombres: str
+    apellidos: str
+    horas_clase: int
