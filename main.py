@@ -35,7 +35,7 @@ def custom_openapi():
         version=OPEN_API_VERSION,
         contact={
             "name": "Ruben Alvarado",
-            "email": "ralvarado@outlook.com",
+            "email": "ruben_aalvarado@outlook.com",
             "url": "https://github.com/kirake-a"
         },
         summary=OPEN_API_SUMMARY,
@@ -47,8 +47,7 @@ def custom_openapi():
         "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
     }
     openapi_schema["info"]["x-contacts"] = [
-        {"name": "Ruben Alvarado", "email": "ralvarado@outlook.com"},
-        {"name": "Monica Garcilazo", "email": "mgarcilazo02@gmail.com"},
+        {"name": "Ruben Alvarado", "email": "ruben_aalvarado@outlook.com"},
     ]
     app.openapi_schema = openapi_schema
     return app.openapi_schema
