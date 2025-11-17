@@ -2,11 +2,13 @@ from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from dtos.response_wrapper import ResponseWrapper
-from exceptions.cannot_delete_resource_exception import CannotDeleteResourceException
-from exceptions.cannot_update_resource_exception import CannotUpdateResourceException
-from exceptions.conflict_with_existing_resources_exception import ConflictWithExistingResourcesException
-from exceptions.resource_not_found_exception import ResourceNotFoundException
+from dtos import ResponseWrapper
+from exceptions import (
+    CannotDeleteResourceException,
+    CannotUpdateResourceException,
+    ConflictWithExistingResourcesException,
+    ResourceNotFoundException
+)
 from utils.constants import UNEXPECTED_ERROR
 
 

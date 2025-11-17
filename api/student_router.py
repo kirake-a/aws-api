@@ -1,8 +1,7 @@
 from typing import List
 from fastapi import APIRouter, status
 
-from dtos.response_wrapper import ResponseWrapper
-from dtos.student_dtos import StudentCreateDTO, StudentResponseDTO, StudentUpdateDTO
+from dtos import StudentCreateDTO, StudentResponseDTO, StudentUpdateDTO, ResponseWrapper
 from services.student_service import StudentService
 
 router = APIRouter(prefix="/alumnos", tags=["Alumnos"])

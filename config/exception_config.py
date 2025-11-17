@@ -11,10 +11,12 @@ def register_exception_handlers(app: FastAPI):
         cannot_delete_exception_handler,
         generic_exception_handler
     )
-    from exceptions.cannot_delete_resource_exception import CannotDeleteResourceException
-    from exceptions.cannot_update_resource_exception import CannotUpdateResourceException
-    from exceptions.conflict_with_existing_resources_exception import ConflictWithExistingResourcesException
-    from exceptions.resource_not_found_exception import ResourceNotFoundException
+    from exceptions import (
+        CannotDeleteResourceException,
+        CannotUpdateResourceException,
+        ConflictWithExistingResourcesException,
+        ResourceNotFoundException
+    )
 
     app.add_exception_handler(ResourceNotFoundException, resource_not_found_exception_handler)
     app.add_exception_handler(ConflictWithExistingResourcesException, conflict_exception_handler)
