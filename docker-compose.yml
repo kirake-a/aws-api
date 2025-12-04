@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mysql-dev:
+    image: mysql:8.0
+    container_name: fastapi_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: aws-api
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: p4ssw0rdD3v
+    ports:
+      - "3306:3306"
+    volumes:
+      - api_data:/var/lib/mysql
+
+volumes:
+  api_data:

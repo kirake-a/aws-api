@@ -5,6 +5,8 @@ from fastapi.responses import JSONResponse
 
 from api.professor_route import router as professor_router
 from api.student_router import router as student_router
+from db.schemas import Base
+from db.database import engine
 from config.exception_config import register_exception_handlers
 from dtos.response_wrapper import ResponseWrapper
 from utils.constants import (
@@ -15,6 +17,8 @@ from utils.constants import (
 )
 
 app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
 
 app.include_router(professor_router)
 app.include_router(student_router)
@@ -30,6 +34,7 @@ async def root() -> ResponseWrapper[dict]:
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
+    
     openapi_schema = get_openapi(
         title="AWS API",
         version=OPEN_API_VERSION,
@@ -43,13 +48,16 @@ def custom_openapi():
         routes=app.routes,
         tags="",
     )
+
     openapi_schema["info"]["x-logo"] = {
         "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
     }
     openapi_schema["info"]["x-contacts"] = [
         {"name": "Ruben Alvarado", "email": "ruben_aalvarado@outlook.com"},
     ]
+
     app.openapi_schema = openapi_schema
+
     return app.openapi_schema
 
 app.openapi = custom_openapi

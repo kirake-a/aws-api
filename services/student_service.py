@@ -1,6 +1,6 @@
 from typing import List
 from config.logger_config import setup_logger
-from db.student_repository import StudentRepository
+from repositories.student_repository import StudentRepository
 from dtos.student_dtos import StudentCreateDTO, StudentUpdateDTO
 from exceptions.cannot_delete_resource_exception import CannotDeleteResourceException
 from exceptions.cannot_update_resource_exception import CannotUpdateResourceException
