@@ -1,12 +1,22 @@
 from typing import List
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
-from dtos import StudentCreateDTO, StudentResponseDTO, StudentUpdateDTO, ResponseWrapper
+from sqlalchemy.orm import Session
+
+from db.database import get_db
+
+from dtos import (
+    StudentCreateDTO,
+    StudentResponseDTO,
+    StudentUpdateDTO,
+    ResponseWrapper
+)
 from services.student_service import StudentService
 
 router = APIRouter(prefix="/alumnos", tags=["Alumnos"])
 
-service = StudentService()
+def get_student_service(db: Session = Depends(get_db)) -> StudentService:
+    return StudentService(db)
 
 @router.get(
     "",
@@ -15,7 +25,9 @@ service = StudentService()
     summary="Get all students",
     description="Retrieve a list of all students in the system."
 )
-async def get_all_students() -> ResponseWrapper[List[StudentResponseDTO]]:
+async def get_all_students(
+    service: StudentService = Depends(get_student_service)
+) -> ResponseWrapper[List[StudentResponseDTO]]:
     students = service.get_all()
 
     return ResponseWrapper(
@@ -31,7 +43,11 @@ async def get_all_students() -> ResponseWrapper[List[StudentResponseDTO]]:
     summary="Get student by ID",
     description="Retrieve a student by their unique ID. Validates that the ID exists."
 )
-async def get_student_by_id(id: int) -> ResponseWrapper[StudentResponseDTO]:
+async def get_student_by_id(
+    id: str,
+    service: StudentService = Depends(get_student_service)
+) -> ResponseWrapper[StudentResponseDTO]:
+
     student = service.get_by_id(id)
 
     return StudentResponseDTO.model_validate(student)
@@ -43,7 +59,11 @@ async def get_student_by_id(id: int) -> ResponseWrapper[StudentResponseDTO]:
     summary="Create a new student",
     description="Create a new student in the system."
 )
-async def create_student(student: StudentCreateDTO) -> ResponseWrapper[StudentResponseDTO]:
+async def create_student(
+    student: StudentCreateDTO,
+    service: StudentService = Depends(get_student_service)
+) -> ResponseWrapper[StudentResponseDTO]:
+
     create_student = service.create(student)
 
     return ResponseWrapper(
@@ -60,7 +80,12 @@ async def create_student(student: StudentCreateDTO) -> ResponseWrapper[StudentRe
     summary="Update an existing student",
     description="Update an existing student in the system."
 )
-async def update_student(id: int, student: StudentUpdateDTO) -> ResponseWrapper[StudentResponseDTO]:
+async def update_student(
+    id: str,
+    student: StudentUpdateDTO,
+    service: StudentService = Depends(get_student_service)
+) -> ResponseWrapper[StudentResponseDTO]:
+
     updated_student = service.update(id, student)
 
     return ResponseWrapper(
@@ -75,5 +100,9 @@ async def update_student(id: int, student: StudentUpdateDTO) -> ResponseWrapper[
     summary="Delete a student",
     description="Delete an existing student from the system."
 )
-async def delete_student(id: int):
+async def delete_student(
+    id: str,
+    service: StudentService = Depends(get_student_service)
+):
+
     service.delete(id)

@@ -1,5 +1,22 @@
 from datetime import datetime
+from passlib.context import CryptContext
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password: str) -> str:
+    """
+    Recibe una contraseña en texto plano y devuelve el hash encriptado.
+    Ejemplo: 'p4ssw0rd' -> '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWrnMnz...'
+    """
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Verifica si la contraseña en texto plano coincide con el hash guardado.
+    IMPORTANTE: Bcrypt usa 'salts' aleatorios, por lo que el hash siempre cambia.
+    No puedes simplemente hashear y comparar strings, debes usar esta función.
+    """
+    return pwd_context.verify(plain_password, hashed_password)
 
 def generate_id() -> str:
     import uuid

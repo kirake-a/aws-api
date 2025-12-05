@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 
 class StudentBaseDTO(BaseModel):
@@ -9,7 +9,8 @@ class StudentBaseDTO(BaseModel):
     promedio: float
 
 class StudentCreateDTO(StudentBaseDTO):
-    id: int
+    password: str
+
     class Config:
         from_attributes = True
 
@@ -17,11 +18,13 @@ class StudentUpdateDTO(BaseModel):
     matricula: Optional[str] = None
     nombres: Optional[str] = None
     apellidos: Optional[str] = None
+    promedio: Optional[float] = None
 
     class Config:
         from_attributes = True
 
 class StudentResponseDTO(StudentBaseDTO):
-    id: int
+    id: str
+    
     class Config:
         from_attributes = True

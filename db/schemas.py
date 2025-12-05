@@ -9,26 +9,26 @@ class StudentSchema(Base):
     __tablename__ = "students"
 
     id = Column(
-        String,
+        String(50),
         primary_key=True,
         default=lambda: str(uuid.uuid4())
     )
-    nombres = Column(String, nullable=False)
-    apellidos = Column(String, nullable=False)
-    matricula = Column(String, unique=True, nullable=False)
+    nombres = Column(String(200), nullable=False)
+    apellidos = Column(String(200), nullable=False)
+    matricula = Column(String(20), unique=True, nullable=False)
     promedio = Column(Float, nullable=False)
-    foto_perfil_url = Column(String, nullable=True)
-    password = Column(String, nullable=False)
+    foto_perfil_url = Column(String(255), nullable=True)
+    password = Column(String(255), nullable=False)
 
 class ProfessorSchema(Base):
     __tablename__ = "professors"
 
     id = Column(
-        String,
+        String(50),
         primary_key=True,
         default=lambda: str(uuid.uuid4())
     )
-    nombres = Column(String, nullable=False)
-    apellidos = Column(String, nullable=False)
+    nombres = Column(String(200), nullable=False)
+    apellidos = Column(String(200), nullable=False)
     numero_empleado = Column(Integer, unique=True, nullable=False)
     horas_clase = Column(Integer, nullable=False)

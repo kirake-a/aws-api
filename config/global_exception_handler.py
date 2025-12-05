@@ -7,7 +7,8 @@ from exceptions import (
     CannotDeleteResourceException,
     CannotUpdateResourceException,
     ConflictWithExistingResourcesException,
-    ResourceNotFoundException
+    ResourceNotFoundException,
+    InvalidArgumentException
 )
 from utils.constants import UNEXPECTED_ERROR
 
@@ -57,6 +58,17 @@ def cannot_update_exception_handler(_request: Request, exc: CannotUpdateResource
     )
 
 def cannot_delete_exception_handler(_request: Request, exc: CannotDeleteResourceException):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content=ResponseWrapper(
+            success=False,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=str(exc),
+            data=None
+        ).model_dump()
+    )
+
+def invalid_argument_exception_handler(_request: Request, exc: InvalidArgumentException):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content=ResponseWrapper(
