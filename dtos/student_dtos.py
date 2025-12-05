@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class StudentBaseDTO(BaseModel):
@@ -24,7 +24,23 @@ class StudentUpdateDTO(BaseModel):
         from_attributes = True
 
 class StudentResponseDTO(StudentBaseDTO):
-    id: str
+    id: int
+    fotoPerfilUrl: Optional[str] = Field(None, alias="foto_perfil_url")
     
     class Config:
         from_attributes = True
+        populate_by_name = True
+
+class StudentLoginDTO(BaseModel):
+    password: str
+
+    class Config:
+        from_attributes = True
+
+class ValidateStudentDTO(BaseModel):
+    sessionString: str = Field(..., alias="session_string")
+
+    class Config:
+        from_attributes = True
+        populate_by_name = True
+        allow_population_by_field_name = True

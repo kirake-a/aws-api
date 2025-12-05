@@ -45,7 +45,7 @@ async def get_all_professors(
     description="Retrieve a professor by their unique ID."
 )
 async def get_professor_by_id(
-    id: str,
+    id: int,
     service: ProfessorService = Depends(get_professor_service)
 ) -> ProfessorResponseDTO:
     professor = service.get_by_id(id)
@@ -91,7 +91,7 @@ async def create_professor(
     description="Update an existing professor in the system."
 )
 async def update_professor(
-    id: str,
+    id: int,
     professor: ProfessorUpdateDTO,
     service: ProfessorService = Depends(get_professor_service)
 ) -> ResponseWrapper[ProfessorResponseDTO]:
@@ -116,7 +116,7 @@ async def update_professor(
     description="Delete an existing professor from the system."
 )
 async def delete_professor(
-    id: str,
+    id: int,
     service: ProfessorService = Depends(get_professor_service)
 ):
     service.delete(id)

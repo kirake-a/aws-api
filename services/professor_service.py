@@ -24,7 +24,7 @@ class ProfessorService(ServiceInterface):
         self.logger.info("Fetching all professors from the repository")
         return self.repository.get_all_professors()
 
-    def get_by_id(self, professor_id: str) -> Professor:
+    def get_by_id(self, professor_id: int) -> Professor:
         self.logger.info(f"Fetching professor with ID: {professor_id}")
         professor = self.repository.get_professor_by_id(professor_id)
 
@@ -52,7 +52,7 @@ class ProfessorService(ServiceInterface):
         self.logger.info(f"Professor created with ID: {professor.id}")
         return professor
 
-    def update(self, professor_id: str, professor_data: ProfessorUpdateDTO) -> Professor:
+    def update(self, professor_id: int, professor_data: ProfessorUpdateDTO) -> Professor:
         existing_professor = self.repository.get_professor_by_id(professor_id)
 
         if not existing_professor:
@@ -70,7 +70,7 @@ class ProfessorService(ServiceInterface):
         self.logger.error(f"Could not update professor with ID: {professor_id}")
         raise CannotUpdateResourceException("Could not update professor")
 
-    def delete(self, professor_id: str) -> None:
+    def delete(self, professor_id: int) -> None:
         if not self.repository.is_professor_exist(professor_id):
             self.logger.error(f"Professor with ID: {professor_id} not found")
             raise ResourceNotFoundException(PROFESSOR_NOT_FOUND)

@@ -24,7 +24,7 @@ class ProfessorUpdateDTO(BaseModel):
         populate_by_name = True
 
 class ProfessorResponseDTO(ProfessorBaseDTO):
-    id: str
+    id: int
 
     class Config:
         from_attributes = True

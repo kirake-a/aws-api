@@ -16,7 +16,7 @@ class ProfessorRepository:
         
         return professors
 
-    def get_professor_by_id(self, professor_id: str) -> Professor | None:
+    def get_professor_by_id(self, professor_id: int) -> Professor | None:
         student_schema = self.db.query(ProfessorSchema).filter(ProfessorSchema.id == professor_id).first()
         
         if not student_schema:
@@ -33,7 +33,7 @@ class ProfessorRepository:
 
         return map_schema_to_model(student_schema)
 
-    def update_professor(self, professor_id: str, updated_professor: dict) -> Professor | None:
+    def update_professor(self, professor_id: int, updated_professor: dict) -> Professor | None:
         student_schema = self.db.query(ProfessorSchema).filter(ProfessorSchema.id == professor_id).first()
 
         if not student_schema:
@@ -48,7 +48,7 @@ class ProfessorRepository:
 
         return map_schema_to_model(student_schema)
 
-    def delete_professor(self, professor_id: str) -> Professor | None:
+    def delete_professor(self, professor_id: int) -> Professor | None:
         professor_deleted = self.db.query(ProfessorSchema).filter(ProfessorSchema.id == professor_id).delete()
 
         self.db.commit()

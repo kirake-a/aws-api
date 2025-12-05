@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, UploadFile, File
 
 from sqlalchemy.orm import Session
 
@@ -9,6 +9,8 @@ from dtos import (
     StudentCreateDTO,
     StudentResponseDTO,
     StudentUpdateDTO,
+    StudentLoginDTO,
+    ValidateStudentDTO,
     ResponseWrapper
 )
 from services.student_service import StudentService
@@ -44,7 +46,7 @@ async def get_all_students(
     description="Retrieve a student by their unique ID. Validates that the ID exists."
 )
 async def get_student_by_id(
-    id: str,
+    id: int,
     service: StudentService = Depends(get_student_service)
 ) -> ResponseWrapper[StudentResponseDTO]:
 
@@ -81,7 +83,7 @@ async def create_student(
     description="Update an existing student in the system."
 )
 async def update_student(
-    id: str,
+    id: int,
     student: StudentUpdateDTO,
     service: StudentService = Depends(get_student_service)
 ) -> ResponseWrapper[StudentResponseDTO]:
@@ -101,8 +103,70 @@ async def update_student(
     description="Delete an existing student from the system."
 )
 async def delete_student(
-    id: str,
+    id: int,
     service: StudentService = Depends(get_student_service)
 ):
 
     service.delete(id)
+
+@router.post(
+    "/{id}/fotoPerfil",
+    status_code=status.HTTP_200_OK,
+    response_model=ResponseWrapper[StudentResponseDTO],
+    summary="Upload profile picture for a student",
+    description="Upload a profile picture for the specified student."
+)
+async def upload_profile_picture(
+    id: int,
+    file: UploadFile = File(...),
+    service: StudentService = Depends(get_student_service)
+):
+    updated_student = service.upload_profile_picture(id, file)
+
+    return ResponseWrapper(
+        success=True,
+        message="Profile picture uploaded successfully.",
+        data=StudentResponseDTO.model_validate(updated_student)
+    )
+
+@router.post(
+    "/{id}/session/login",
+    status_code=status.HTTP_200_OK,
+    response_model=ResponseWrapper[str],
+    summary="Student login",
+    description="Authenticate a student and create a session."
+)
+async def session_login(
+    id: int,
+    data: StudentLoginDTO,
+    service: StudentService = Depends(get_student_service)
+):
+    pass
+
+@router.post(
+    "/{id}/session/verify",
+    status_code=status.HTTP_200_OK,
+    response_model=ResponseWrapper[bool],
+    summary="Verify student session",
+    description="Verify if a student's session is still valid."
+)
+async def session_verify(
+    id: int,
+    session: ValidateStudentDTO,
+    service: StudentService = Depends(get_student_service)
+):
+    pass
+
+@router.post(
+    "/{id}/session/logout",
+    status_code=status.HTTP_200_OK,
+    response_model=ResponseWrapper[None],
+    summary="Student logout",
+    description="Terminate a student's session."
+)
+async def session_logout(
+    id: str,
+    session: ValidateStudentDTO,
+    service: StudentService = Depends(get_student_service)
+):
+    pass

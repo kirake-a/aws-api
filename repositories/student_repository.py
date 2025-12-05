@@ -17,7 +17,7 @@ class StudentRepository:
 
         return students
 
-    def get_student_by_id(self, student_id: str) -> Student | None:
+    def get_student_by_id(self, student_id: int) -> Student | None:
         student_schema = self.db.query(StudentSchema).filter(StudentSchema.id == student_id).first()
         
         if not student_schema:
@@ -34,7 +34,7 @@ class StudentRepository:
 
         return map_schema_to_model(student_schema)
 
-    def update_student(self, student_id: str, updated_student: dict) -> Student | None:
+    def update_student(self, student_id: int, updated_student: dict) -> Student | None:
         student_schema = self.db.query(StudentSchema).filter(StudentSchema.id == student_id).first()
 
         if not student_schema:
@@ -49,14 +49,14 @@ class StudentRepository:
 
         return map_schema_to_model(student_schema)
 
-    def delete_student(self, student_id: str) -> bool:
+    def delete_student(self, student_id: int) -> bool:
         student_deleted = self.db.query(StudentSchema).filter(StudentSchema.id == student_id).delete()
         
         self.db.commit()
 
         return student_deleted > 0
 
-    def exist(self, student_id: str) -> bool:
+    def exist(self, student_id: int) -> bool:
         exits_student = self.db.query(StudentSchema).filter(StudentSchema.id == student_id).first()
 
         return exits_student is not None

@@ -8,11 +8,7 @@ Base = declarative_base()
 class StudentSchema(Base):
     __tablename__ = "students"
 
-    id = Column(
-        String(50),
-        primary_key=True,
-        default=lambda: str(uuid.uuid4())
-    )
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nombres = Column(String(200), nullable=False)
     apellidos = Column(String(200), nullable=False)
     matricula = Column(String(20), unique=True, nullable=False)
@@ -23,11 +19,7 @@ class StudentSchema(Base):
 class ProfessorSchema(Base):
     __tablename__ = "professors"
 
-    id = Column(
-        String(50),
-        primary_key=True,
-        default=lambda: str(uuid.uuid4())
-    )
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nombres = Column(String(200), nullable=False)
     apellidos = Column(String(200), nullable=False)
     numero_empleado = Column(Integer, unique=True, nullable=False)

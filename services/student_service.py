@@ -1,3 +1,5 @@
+from fastapi import UploadFile
+
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -13,6 +15,7 @@ from exceptions.conflict_with_existing_resources_exception import ConflictWithEx
 from exceptions.resource_not_found_exception import ResourceNotFoundException
 from interfaces.service_interface import ServiceInterface
 from models.student import Student
+from services.s3_service import S3Service
 from utils.constants import STUDENT_NOT_FOUND
 from utils.id_factory import get_password_hash
 
@@ -20,13 +23,14 @@ from utils.id_factory import get_password_hash
 class StudentService(ServiceInterface):
     def __init__(self, db: Session):
         self.repository = StudentRepository(db)
+        self.s3_service = S3Service()
         self.logger = setup_logger(self.__class__.__name__)
         
     def get_all(self) -> List[Student]:
         self.logger.info("Fetching all students from the repository")
         return self.repository.get_all_students()
 
-    def get_by_id(self, student_id: str) -> Student:
+    def get_by_id(self, student_id: int) -> Student:
         self.logger.info(f"Fetching student with ID: {student_id}")
         student = self.repository.get_student_by_id(student_id)
 
@@ -55,7 +59,7 @@ class StudentService(ServiceInterface):
         self.logger.info(f"Student created with ID: {student.id}")
         return student
 
-    def update(self, student_id: str, student_data: StudentUpdateDTO) -> Student:
+    def update(self, student_id: int, student_data: StudentUpdateDTO) -> Student:
         self.logger.info("Starting update process")
         if student_data.promedio is not None:
             if student_data.promedio < 0.0 or student_data.promedio > 10.0:
@@ -73,7 +77,7 @@ class StudentService(ServiceInterface):
         self.logger.error(f"Could not update student with ID: {student_id}")
         raise CannotUpdateResourceException("Could not update student")
 
-    def delete(self, student_id: str) -> None:
+    def delete(self, student_id: int) -> None:
         self.logger.info(f"Attempt to delete student with ID: {student_id}")
         was_student = self.repository.delete_student(student_id)
 
@@ -82,3 +86,28 @@ class StudentService(ServiceInterface):
             raise CannotDeleteResourceException("Could not delete student")
         
         self.logger.info(f"Student with ID: {student_id} deleted successfully")
+
+    def upload_profile_picture(self, student_id: int, file: UploadFile) -> Student:
+        self.logger.info(f"Uploading profile picture for student ID: {student_id}")
+
+        if not file.content_type.startswith("image/"):
+            self.logger.error("Uploaded file is not an image")
+            raise InvalidArgumentException("Uploaded file must be an image")
+
+        student = self.repository.get_student_by_id(student_id)
+
+        if not student:
+            self.logger.error(f"Student with ID: {student_id} not found")
+            raise ResourceNotFoundException(STUDENT_NOT_FOUND)
+        
+        file_extension = file.filename.split(".")[-1]
+        file_name = f"profiles/students/{student_id}.{file_extension}"
+
+        url = self.s3_service.upload_file(file, file_name)
+
+        updated_student = self.repository.update_student(
+            student_id,
+            {"foto_perfil_url": url}
+        )
+
+        return updated_student

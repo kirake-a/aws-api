@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Professor:
-    id: str
+    id: int
     numero_empleado: int
     nombres: str
     apellidos: str

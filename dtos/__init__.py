@@ -1,7 +1,9 @@
 from .student_dtos import (
     StudentCreateDTO,
     StudentResponseDTO,
-    StudentUpdateDTO
+    StudentUpdateDTO,
+    StudentLoginDTO,
+    ValidateStudentDTO
 )
 from .professor_dtos import (
     ProfessorCreateDTO,
