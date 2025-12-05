@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import JSONResponse
 
 from api.professor_route import router as professor_router
 from api.student_router import router as student_router
@@ -12,7 +11,6 @@ from dtos.response_wrapper import ResponseWrapper
 from utils.constants import (
     OPEN_API_DESCRIPTION,
     OPEN_API_SUMMARY,
-    OPEN_API_TAGS,
     OPEN_API_VERSION
 )
 
