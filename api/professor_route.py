@@ -1,12 +1,17 @@
 from typing import List
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
+
+from sqlalchemy.orm import Session
+
+from db.database import get_db
 
 from dtos import ProfessorCreateDTO, ProfessorResponseDTO, ProfessorUpdateDTO, ResponseWrapper
 from services.professor_service import ProfessorService
 
 router = APIRouter(prefix="/profesores", tags=["Profesores"])
 
-service = ProfessorService()
+def get_professor_service(db: Session = Depends(get_db)) -> ProfessorService:
+    return ProfessorService(db)
 
 @router.get(
     "",
@@ -15,7 +20,9 @@ service = ProfessorService()
     summary="Get all professors",
     description="Retrieve a list of all professors in the system."
 )
-async def get_all_professors() -> ResponseWrapper[List[ProfessorResponseDTO]]:
+async def get_all_professors(
+    service: ProfessorService = Depends(get_professor_service)
+) -> ResponseWrapper[List[ProfessorResponseDTO]]:
     professors = service.get_all()
 
     return ResponseWrapper(
@@ -37,7 +44,10 @@ async def get_all_professors() -> ResponseWrapper[List[ProfessorResponseDTO]]:
     summary="Get professor by ID",
     description="Retrieve a professor by their unique ID."
 )
-async def get_professor_by_id(id: int) -> ProfessorResponseDTO:
+async def get_professor_by_id(
+    id: str,
+    service: ProfessorService = Depends(get_professor_service)
+) -> ProfessorResponseDTO:
     professor = service.get_by_id(id)
 
     return ProfessorResponseDTO(
@@ -55,7 +65,10 @@ async def get_professor_by_id(id: int) -> ProfessorResponseDTO:
     summary="Create a new professor",
     description="Create a new professor in the system."
 )
-async def create_professor(professor: ProfessorCreateDTO) -> ResponseWrapper[ProfessorResponseDTO]:
+async def create_professor(
+    professor: ProfessorCreateDTO,
+    service: ProfessorService = Depends(get_professor_service)
+) -> ResponseWrapper[ProfessorResponseDTO]:
     created_professor = service.create(professor)
 
     return ResponseWrapper(
@@ -77,7 +90,11 @@ async def create_professor(professor: ProfessorCreateDTO) -> ResponseWrapper[Pro
     summary="Update a professor",
     description="Update an existing professor in the system."
 )
-async def update_professor(id: int, professor: ProfessorUpdateDTO) -> ResponseWrapper[ProfessorResponseDTO]:
+async def update_professor(
+    id: str,
+    professor: ProfessorUpdateDTO,
+    service: ProfessorService = Depends(get_professor_service)
+) -> ResponseWrapper[ProfessorResponseDTO]:
     updated_professor = service.update(id, professor)
 
     return ResponseWrapper(
@@ -98,5 +115,8 @@ async def update_professor(id: int, professor: ProfessorUpdateDTO) -> ResponseWr
     summary="Delete a professor",
     description="Delete an existing professor from the system."
 )
-async def delete_professor(id: int):
+async def delete_professor(
+    id: str,
+    service: ProfessorService = Depends(get_professor_service)
+):
     service.delete(id)

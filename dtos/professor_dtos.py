@@ -9,7 +9,7 @@ class ProfessorBaseDTO(BaseModel):
     horasClase: int
 
 class ProfessorCreateDTO(ProfessorBaseDTO):
-    id: int
+    
     class Config:
         from_attributes = True
 
@@ -24,7 +24,7 @@ class ProfessorUpdateDTO(BaseModel):
         populate_by_name = True
 
 class ProfessorResponseDTO(ProfessorBaseDTO):
-    id: int
+    id: str
 
     class Config:
         from_attributes = True

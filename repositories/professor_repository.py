@@ -1,43 +1,61 @@
 from typing import List
+from db.schemas import ProfessorSchema
+from mappers.professor_mapper import map_schema_to_model, map_model_to_schema
 from models.professor import Professor
 
+from sqlalchemy.orm import Session
+
 class ProfessorRepository:
-    def __init__(self):
-        self.professor_data: List[Professor] = []
+    def __init__(self, db: Session):
+        self.db = db
 
     def get_all_professors(self) -> List[Professor]:
-        return self.professor_data
+        professors_schema = self.db.query(ProfessorSchema).all()
 
-    def get_professor_by_id(self, professor_id: int) -> Professor | None:
-        for professor in self.professor_data:
-            if professor.id == professor_id:
-                return professor
+        professors = [map_schema_to_model(professor_schema) for professor_schema in professors_schema]
+        
+        return professors
 
-        return None
+    def get_professor_by_id(self, professor_id: str) -> Professor | None:
+        student_schema = self.db.query(ProfessorSchema).filter(ProfessorSchema.id == professor_id).first()
+        
+        if not student_schema:
+            return None
+        
+        return map_schema_to_model(student_schema)
 
     def create_professor(self, professor: Professor) -> Professor:
-        self.professor_data.append(professor)
+        student_schema = map_model_to_schema(professor)
 
-        return professor
+        self.db.add(student_schema)
+        self.db.commit()
+        self.db.refresh(student_schema)
 
-    def update_professor(self, professor_id: int, updated_professor: Professor) -> Professor | None:
-        for index, professor in enumerate(self.professor_data):
-            if professor.id == professor_id:
-                self.professor_data[index] = updated_professor
-                return updated_professor
+        return map_schema_to_model(student_schema)
 
-        return None
+    def update_professor(self, professor_id: str, updated_professor: dict) -> Professor | None:
+        student_schema = self.db.query(ProfessorSchema).filter(ProfessorSchema.id == professor_id).first()
 
-    def delete_professor(self, professor_id: int) -> Professor | None:
-        for index, professor in enumerate(self.professor_data):
-            if professor.id == professor_id:
-                del self.professor_data[index]
-                return professor
+        if not student_schema:
+            return None
+        
+        for key, value in updated_professor.items():
+            if (hasattr(student_schema, key)):
+                setattr(student_schema, key, value)
 
-        return None
+        self.db.commit()
+        self.db.refresh(student_schema)
+
+        return map_schema_to_model(student_schema)
+
+    def delete_professor(self, professor_id: str) -> Professor | None:
+        professor_deleted = self.db.query(ProfessorSchema).filter(ProfessorSchema.id == professor_id).delete()
+
+        self.db.commit()
+
+        return professor_deleted > 0
 
     def is_professor_exist(self, professor_id: int) -> bool:
-        for professor in self.professor_data:
-            if professor.id == professor_id:
-                return True
-        return False
+        exists_professor = self.db.query(ProfessorSchema).filter(ProfessorSchema.id == professor_id).first()
+
+        return exists_professor is not None
