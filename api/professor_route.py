@@ -61,26 +61,22 @@ async def get_professor_by_id(
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseWrapper[ProfessorResponseDTO],
+    response_model=ProfessorResponseDTO,
     summary="Create a new professor",
     description="Create a new professor in the system."
 )
 async def create_professor(
     professor: ProfessorCreateDTO,
     service: ProfessorService = Depends(get_professor_service)
-) -> ResponseWrapper[ProfessorResponseDTO]:
+) -> ProfessorResponseDTO:
     created_professor = service.create(professor)
 
-    return ResponseWrapper(
-        success=True,
-        message="Professor created successfully.",
-        data= ProfessorResponseDTO(
-            id=created_professor.id,
-            nombres=created_professor.nombres,
-            apellidos=created_professor.apellidos,
-            numeroEmpleado=created_professor.numero_empleado,
-            horasClase=created_professor.horas_clase
-        )
+    return ProfessorResponseDTO(
+        id=created_professor.id,
+        nombres=created_professor.nombres,
+        apellidos=created_professor.apellidos,
+        numeroEmpleado=created_professor.numero_empleado,
+        horasClase=created_professor.horas_clase
     )
 
 @router.put(

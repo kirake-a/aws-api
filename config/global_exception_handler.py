@@ -59,10 +59,10 @@ def cannot_update_exception_handler(_request: Request, exc: CannotUpdateResource
 
 def cannot_delete_exception_handler(_request: Request, exc: CannotDeleteResourceException):
     return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
+        status_code=status.HTTP_404_NOT_FOUND,
         content=ResponseWrapper(
             success=False,
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             message=str(exc),
             data=None
         ).model_dump()

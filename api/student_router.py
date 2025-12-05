@@ -57,23 +57,19 @@ async def get_student_by_id(
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseWrapper[StudentResponseDTO],
+    response_model=StudentResponseDTO,
     summary="Create a new student",
     description="Create a new student in the system."
 )
 async def create_student(
     student: StudentCreateDTO,
     service: StudentService = Depends(get_student_service)
-) -> ResponseWrapper[StudentResponseDTO]:
+) -> StudentResponseDTO:
 
     create_student = service.create(student)
 
-    return ResponseWrapper(
-        success=True,
-        message="Student created successfully.",
-        data=StudentResponseDTO.model_validate(create_student),
-        status_code=status.HTTP_201_CREATED
-    )
+    return StudentResponseDTO.model_validate(create_student)
+
 
 @router.put(
     "/{id}",
