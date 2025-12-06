@@ -90,10 +90,6 @@ class StudentService(ServiceInterface):
     def upload_profile_picture(self, student_id: int, file: UploadFile) -> Student:
         self.logger.info(f"Uploading profile picture for student ID: {student_id}")
 
-        if not file.content_type.startswith("image/"):
-            self.logger.error("Uploaded file is not an image")
-            raise InvalidArgumentException("Uploaded file must be an image")
-
         student = self.repository.get_student_by_id(student_id)
 
         if not student:

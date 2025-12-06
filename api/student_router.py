@@ -108,22 +108,30 @@ async def delete_student(
 @router.post(
     "/{id}/fotoPerfil",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseWrapper[StudentResponseDTO],
+    response_model=StudentResponseDTO,
     summary="Upload profile picture for a student",
     description="Upload a profile picture for the specified student."
 )
 async def upload_profile_picture(
     id: int,
-    file: UploadFile = File(...),
+    foto: UploadFile = File(...),
+    service: StudentService = Depends(get_student_service)
+) -> StudentResponseDTO:
+    updated_student = service.upload_profile_picture(id, foto)
+
+    return StudentResponseDTO.model_validate(updated_student)
+
+@router.post(
+    "/{id}/email",
+    status_code=status.HTTP_200_OK,
+    summary="Send email to professor about student",
+    description="Send an email to the professor regarding the specified student."
+)
+async def email(
+    id: int,
     service: StudentService = Depends(get_student_service)
 ):
-    updated_student = service.upload_profile_picture(id, file)
-
-    return ResponseWrapper(
-        success=True,
-        message="Profile picture uploaded successfully.",
-        data=StudentResponseDTO.model_validate(updated_student)
-    )
+    pass
 
 @router.post(
     "/{id}/session/login",

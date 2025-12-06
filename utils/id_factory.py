@@ -1,5 +1,6 @@
 from datetime import datetime
 from passlib.context import CryptContext
+import secrets
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -17,6 +18,13 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     No puedes simplemente hashear y comparar strings, debes usar esta función.
     """
     return pwd_context.verify(plain_password, hashed_password)
+
+def generate_session_string() -> str:
+    """
+    Genera un string aleatorio seguro de 128 caracteres hexadecimales.
+    secrets.token_hex(64) genera 64 bytes = 128 caracteres hex.
+    """
+    return secrets.token_hex(64)
 
 def generate_id() -> str:
     import uuid

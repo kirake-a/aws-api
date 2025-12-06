@@ -25,7 +25,7 @@ class StudentUpdateDTO(BaseModel):
 
 class StudentResponseDTO(StudentBaseDTO):
     id: int
-    fotoPerfilUrl: Optional[str] = Field(None, alias="foto_perfil_url")
+    fotoPerfilUrl: Optional[str] = Field(None, validation_alias="foto_perfil_url")
     
     class Config:
         from_attributes = True

@@ -26,9 +26,8 @@ class S3Service:
             )
             
             # Construct the public URL manually
-            # Format: https://{bucket}.s3.{region}.amazonaws.com/{key}
-            region = os.getenv("AWS_REGION")
-            url = f"https://{self.bucket_name}.s3.{region}.amazonaws.com/{file_name}"
+            #region = os.getenv("AWS_REGION")
+            url = f"https://{self.bucket_name}.s3.amazonaws.com/{file_name}"
             
             return url
             
