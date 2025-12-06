@@ -10,6 +10,7 @@ from exceptions import (
     ResourceNotFoundException,
     InvalidArgumentException
 )
+from exceptions.invalid_session_exception import InvalidSessionException
 from utils.constants import UNEXPECTED_ERROR
 
 
@@ -69,6 +70,17 @@ def cannot_delete_exception_handler(_request: Request, exc: CannotDeleteResource
     )
 
 def invalid_argument_exception_handler(_request: Request, exc: InvalidArgumentException):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content=ResponseWrapper(
+            success=False,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=str(exc),
+            data=None
+        ).model_dump()
+    )
+
+def invalid_session_exception_handler(_request: Request, exc: InvalidSessionException):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content=ResponseWrapper(

@@ -43,3 +43,9 @@ class ValidateStudentDTO(BaseModel):
     class Config:
         from_attributes = True
         populate_by_name = True
+
+class SessionResponseDTO(BaseModel):
+    sessionString: str
+
+    class Config:
+        from_attributes = True

@@ -13,6 +13,8 @@ from dtos import (
     ValidateStudentDTO,
     ResponseWrapper
 )
+from dtos.student_dtos import SessionResponseDTO
+from exceptions.invalid_session_exception import InvalidSessionException
 from services.student_service import StudentService
 
 router = APIRouter(prefix="/alumnos", tags=["Alumnos"])
@@ -136,7 +138,7 @@ async def email(
 @router.post(
     "/{id}/session/login",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseWrapper[str],
+    response_model=SessionResponseDTO,
     summary="Student login",
     description="Authenticate a student and create a session."
 )
@@ -144,8 +146,10 @@ async def session_login(
     id: int,
     data: StudentLoginDTO,
     service: StudentService = Depends(get_student_service)
-):
-    pass
+) -> dict:
+    session_string = service.login(id, data.password)
+
+    return SessionResponseDTO(sessionString=session_string)
 
 @router.post(
     "/{id}/session/verify",
@@ -159,18 +163,26 @@ async def session_verify(
     session: ValidateStudentDTO,
     service: StudentService = Depends(get_student_service)
 ):
-    pass
+    is_valid = service.validate_session(id, session.sessionString)
+
+    if is_valid:
+        return ResponseWrapper(
+            success=True,
+            message="Session validation completed successfully.",
+            data=is_valid
+        )
+    else:
+        raise InvalidSessionException("Invalid or expired session.")
 
 @router.post(
     "/{id}/session/logout",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseWrapper[None],
     summary="Student logout",
     description="Terminate a student's session."
 )
 async def session_logout(
-    id: str,
+    id: int,
     session: ValidateStudentDTO,
     service: StudentService = Depends(get_student_service)
 ):
-    pass
+    service.logout(id, session.sessionString)

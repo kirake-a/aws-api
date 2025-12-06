@@ -3,11 +3,13 @@ from .cannot_update_resource_exception import CannotUpdateResourceException
 from .conflict_with_existing_resources_exception import ConflictWithExistingResourcesException
 from .resource_not_found_exception import ResourceNotFoundException
 from .invalid_argument_exception import InvalidArgumentException
+from .invalid_session_exception import InvalidSessionException
 
 __all__ = [
     "CannotDeleteResourceException",
     "CannotUpdateResourceException",
     "ConflictWithExistingResourcesException",
     "ResourceNotFoundException",
-    "InvalidArgumentException"
+    "InvalidArgumentException",
+    "InvalidSessionException"
 ]

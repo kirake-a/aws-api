@@ -15,15 +15,21 @@ from exceptions.conflict_with_existing_resources_exception import ConflictWithEx
 from exceptions.resource_not_found_exception import ResourceNotFoundException
 from interfaces.service_interface import ServiceInterface
 from models.student import Student
+from services.dynamo_service import DynamoDBService
 from services.s3_service import S3Service
 from utils.constants import STUDENT_NOT_FOUND
-from utils.id_factory import get_password_hash
+from utils.id_factory import (
+    get_password_hash,
+    verify_password,
+    generate_session_string
+)
 
 
 class StudentService(ServiceInterface):
     def __init__(self, db: Session):
         self.repository = StudentRepository(db)
         self.s3_service = S3Service()
+        self.dynamo_service = DynamoDBService()
         self.logger = setup_logger(self.__class__.__name__)
         
     def get_all(self) -> List[Student]:
@@ -107,3 +113,59 @@ class StudentService(ServiceInterface):
         )
 
         return updated_student
+    
+    def login(
+        self,
+        student_id: int,
+        password: str
+    ) -> str:
+        self.logger.info(f"Attempt to login with student ID: {student_id}")
+        student = self.repository.get_student_by_id(student_id)
+
+        if not student:
+            self.logger.error(f"Student with ID: {student_id} not found")
+            raise ResourceNotFoundException(STUDENT_NOT_FOUND)
+        
+        if not verify_password(password, student.password):
+            self.logger.error("Invalid password provided")
+            raise InvalidArgumentException("Invalid password")
+        
+        session_string = generate_session_string()
+        self.dynamo_service.create_session(student_id, session_string)
+
+        self.logger.info(f"Student with ID: {student_id} logged in successfully")
+        return session_string
+
+    def validate_session(
+        self,
+        student_id: int,
+        session_string: str
+    ) -> bool:
+        self.logger.info(f"Validating session for student ID: {student_id}")
+
+        session = self.dynamo_service.get_session_by_string(session_string)
+
+        if not session:
+            return False
+        
+        if int(session['alumnoId']) != student_id:
+            return False
+        
+        if not session['active']:
+            return False
+        
+        self.logger.info(f"Session for student ID: {student_id} is valid")
+        return True
+
+    def logout(
+        self,
+        student_id: int,
+        session_string: str
+    ):
+        self.logger.info(f"Attempt to logout student ID: {student_id}")
+
+        session = self.dynamo_service.get_session_by_string(session_string)
+
+        if session and int(session.get('alumnoId')) == student_id:
+            self.dynamo_service.invalidate_session(session['id'])
+            self.logger.info(f"Student with ID: {student_id} logged out successfully")
