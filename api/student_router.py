@@ -125,7 +125,8 @@ async def upload_profile_picture(
 
 @router.post(
     "/{id}/email",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_200_OK,\
+    response_model=ResponseWrapper[None],
     summary="Send email to professor about student",
     description="Send an email to the professor regarding the specified student."
 )
@@ -133,7 +134,13 @@ async def email(
     id: int,
     service: StudentService = Depends(get_student_service)
 ):
-    pass
+    service.send_student_info_email(id)
+
+    return ResponseWrapper(
+        success=True,
+        message="Email sent successfully.",
+        data=None
+    )
 
 @router.post(
     "/{id}/session/login",

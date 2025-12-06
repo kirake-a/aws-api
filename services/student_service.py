@@ -17,6 +17,7 @@ from interfaces.service_interface import ServiceInterface
 from models.student import Student
 from services.dynamo_service import DynamoDBService
 from services.s3_service import S3Service
+from services.sns_service import SNSService
 from utils.constants import STUDENT_NOT_FOUND
 from utils.id_factory import (
     get_password_hash,
@@ -30,6 +31,7 @@ class StudentService(ServiceInterface):
         self.repository = StudentRepository(db)
         self.s3_service = S3Service()
         self.dynamo_service = DynamoDBService()
+        self.sns_service = SNSService()
         self.logger = setup_logger(self.__class__.__name__)
         
     def get_all(self) -> List[Student]:
@@ -169,3 +171,28 @@ class StudentService(ServiceInterface):
         if session and int(session.get('alumnoId')) == student_id:
             self.dynamo_service.invalidate_session(session['id'])
             self.logger.info(f"Student with ID: {student_id} logged out successfully")
+
+    def send_student_info_email(self, student_id: int):
+        self.logger.info(f"Preparing to send email info for student ID: {student_id}")
+
+        student = self.repository.get_student_by_id(student_id)
+        if not student:
+            raise ResourceNotFoundException(STUDENT_NOT_FOUND)
+
+        subject = f"Información Académica: {student.nombres} {student.apellidos}"
+        
+        message = (
+            f"Hola,\n\n"
+            f"Se ha solicitado la información del siguiente alumno:\n"
+            f"---------------------------------------------------\n"
+            f"ID: {student.id}\n"
+            f"Nombre: {student.nombres} {student.apellidos}\n"
+            f"Matrícula: {student.matricula}\n"
+            f"Promedio General: {student.promedio}\n"
+            f"---------------------------------------------------\n"
+            f"Saludos,\nSistema de Alumnos AWS API"
+        )
+
+        self.sns_service.publish_message(subject, message)
+        
+        self.logger.info("Email notification sent via SNS successfully")
